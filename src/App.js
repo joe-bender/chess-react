@@ -1,134 +1,95 @@
-import './App.css';
+import "./App.css";
 
 function getPiece(abbrev) {
-  switch(abbrev) {
-    case 'bp':
+  switch (abbrev) {
+    case "bp":
       return "\u265F";
-    case 'br':
+    case "br":
       return "\u265C";
-    case 'bn':
+    case "bn":
       return "\u265E";
-    case 'bb':
+    case "bb":
       return "\u265D";
-    case 'bq':
+    case "bq":
       return "\u265B";
-    case 'bk':
+    case "bk":
       return "\u265A";
-    case 'wp':
+    case "wp":
       return "\u2659";
-    case 'wr':
+    case "wr":
       return "\u2656";
-    case 'wn':
+    case "wn":
       return "\u2658";
-    case 'wb':
+    case "wb":
       return "\u2657";
-    case 'wq':
+    case "wq":
       return "\u2655";
-    case 'wk':
+    case "wk":
       return "\u2654";
     default:
       return;
   }
 }
 
+function Square(props) {
+  return <td className={props.color}>{props.piece}</td>;
+}
+
+function Row(props) {
+  if (props.startWhite) {
+    return (
+      <tr>
+        <Square color="white" piece={props.pieces[0]} />
+        <Square color="black" piece={props.pieces[1]} />
+        <Square color="white" piece={props.pieces[2]} />
+        <Square color="black" piece={props.pieces[3]} />
+        <Square color="white" piece={props.pieces[4]} />
+        <Square color="black" piece={props.pieces[5]} />
+        <Square color="white" piece={props.pieces[6]} />
+        <Square color="black" piece={props.pieces[7]} />
+      </tr>
+    );
+  }
+  return (
+    <tr>
+      <Square color="black" piece={props.pieces[0]} />
+      <Square color="white" piece={props.pieces[1]} />
+      <Square color="black" piece={props.pieces[2]} />
+      <Square color="white" piece={props.pieces[3]} />
+      <Square color="black" piece={props.pieces[4]} />
+      <Square color="white" piece={props.pieces[5]} />
+      <Square color="black" piece={props.pieces[6]} />
+      <Square color="white" piece={props.pieces[7]} />
+    </tr>
+  );
+}
+
 function Board() {
   let boardState = [
-    ['br', 'bn', 'bb', 'bq', 'bk', 'bb', 'bn', 'br'],
-    ['bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp'],
+    ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
+    ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null],
-    ['wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp'],
-    ['wr', 'wn', 'wb', 'wq', 'wk', 'wb', 'wn', 'wr']
+    ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+    ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
   ];
 
   return (
     <table>
       <tbody>
-        <tr>
-          <td className="white">{getPiece(boardState[0][0])}</td>
-          <td className="black">{getPiece(boardState[0][1])}</td>
-          <td className="white">{getPiece(boardState[0][2])}</td>
-          <td className="black">{getPiece(boardState[0][3])}</td>
-          <td className="white">{getPiece(boardState[0][4])}</td>
-          <td className="black">{getPiece(boardState[0][5])}</td>
-          <td className="white">{getPiece(boardState[0][6])}</td>
-          <td className="black">{getPiece(boardState[0][7])}</td>
-        </tr>
-        <tr>
-          <td className="black">{getPiece(boardState[1][0])}</td>
-          <td className="white">{getPiece(boardState[1][1])}</td>
-          <td className="black">{getPiece(boardState[1][2])}</td>
-          <td className="white">{getPiece(boardState[1][3])}</td>
-          <td className="black">{getPiece(boardState[1][4])}</td>
-          <td className="white">{getPiece(boardState[1][5])}</td>
-          <td className="black">{getPiece(boardState[1][6])}</td>
-          <td className="white">{getPiece(boardState[1][7])}</td>
-        </tr>
-        <tr>
-          <td className="white">{getPiece(boardState[2][0])}</td>
-          <td className="black">{getPiece(boardState[2][1])}</td>
-          <td className="white">{getPiece(boardState[2][2])}</td>
-          <td className="black">{getPiece(boardState[2][3])}</td>
-          <td className="white">{getPiece(boardState[2][4])}</td>
-          <td className="black">{getPiece(boardState[2][5])}</td>
-          <td className="white">{getPiece(boardState[2][6])}</td>
-          <td className="black">{getPiece(boardState[2][7])}</td>
-        </tr>
-        <tr>
-          <td className="black">{getPiece(boardState[3][0])}</td>
-          <td className="white">{getPiece(boardState[3][1])}</td>
-          <td className="black">{getPiece(boardState[3][2])}</td>
-          <td className="white">{getPiece(boardState[3][3])}</td>
-          <td className="black">{getPiece(boardState[3][4])}</td>
-          <td className="white">{getPiece(boardState[3][5])}</td>
-          <td className="black">{getPiece(boardState[3][6])}</td>
-          <td className="white">{getPiece(boardState[3][7])}</td>
-        </tr>
-        <tr>
-          <td className="white">{getPiece(boardState[4][0])}</td>
-          <td className="black">{getPiece(boardState[4][1])}</td>
-          <td className="white">{getPiece(boardState[4][2])}</td>
-          <td className="black">{getPiece(boardState[4][3])}</td>
-          <td className="white">{getPiece(boardState[4][4])}</td>
-          <td className="black">{getPiece(boardState[4][5])}</td>
-          <td className="white">{getPiece(boardState[4][6])}</td>
-          <td className="black">{getPiece(boardState[4][7])}</td>
-        </tr>
-        <tr>
-          <td className="black">{getPiece(boardState[5][0])}</td>
-          <td className="white">{getPiece(boardState[5][1])}</td>
-          <td className="black">{getPiece(boardState[5][2])}</td>
-          <td className="white">{getPiece(boardState[5][3])}</td>
-          <td className="black">{getPiece(boardState[5][4])}</td>
-          <td className="white">{getPiece(boardState[5][5])}</td>
-          <td className="black">{getPiece(boardState[5][6])}</td>
-          <td className="white">{getPiece(boardState[5][7])}</td>
-        </tr>
-        <tr>
-          <td className="white">{getPiece(boardState[6][0])}</td>
-          <td className="black">{getPiece(boardState[6][1])}</td>
-          <td className="white">{getPiece(boardState[6][2])}</td>
-          <td className="black">{getPiece(boardState[6][3])}</td>
-          <td className="white">{getPiece(boardState[6][4])}</td>
-          <td className="black">{getPiece(boardState[6][5])}</td>
-          <td className="white">{getPiece(boardState[6][6])}</td>
-          <td className="black">{getPiece(boardState[6][7])}</td>
-        </tr>
-        <tr>
-          <td className="black">{getPiece(boardState[7][0])}</td>
-          <td className="white">{getPiece(boardState[7][1])}</td>
-          <td className="black">{getPiece(boardState[7][2])}</td>
-          <td className="white">{getPiece(boardState[7][3])}</td>
-          <td className="black">{getPiece(boardState[7][4])}</td>
-          <td className="white">{getPiece(boardState[7][5])}</td>
-          <td className="black">{getPiece(boardState[7][6])}</td>
-          <td className="white">{getPiece(boardState[7][7])}</td>
-        </tr>
+        <Row startWhite={true} pieces={boardState[0].map(getPiece)} />
+        <Row startWhite={false} pieces={boardState[1].map(getPiece)} />
+        <Row startWhite={true} pieces={boardState[2].map(getPiece)} />
+        <Row startWhite={false} pieces={boardState[3].map(getPiece)} />
+        <Row startWhite={true} pieces={boardState[4].map(getPiece)} />
+        <Row startWhite={false} pieces={boardState[5].map(getPiece)} />
+        <Row startWhite={true} pieces={boardState[6].map(getPiece)} />
+        <Row startWhite={false} pieces={boardState[7].map(getPiece)} />
       </tbody>
     </table>
-  )
+  );
 }
 
 function App() {
