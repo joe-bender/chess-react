@@ -19,3 +19,7 @@ td.white {
 td.black {
   background-color: rgb(109, 109, 109);
 }
+
+td.selected {
+  background-color: aqua;
+}
