@@ -9,6 +9,7 @@ td {
   height: 50px;
   font-size: 35px;
   text-align: center;
+  user-select: none;
 }
 
 td.white {
