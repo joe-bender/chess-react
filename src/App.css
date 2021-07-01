@@ -23,3 +23,7 @@ td.black {
 td.selected {
   background-color: aqua;
 }
+
+td.target {
+  background-color: rgb(75, 253, 134);
+}
