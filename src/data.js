@@ -37,10 +37,10 @@ export const boardEmpty = [
 
 export const boardUtil = [
   [null, null, null, null, null, null, null, null],
+  [null, "bp", null, null, null, null, null, null],
+  [null, null, null, null, null, "bn", null, null],
   [null, null, null, null, null, null, null, null],
-  [null, null, "wk", null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, "bk", null, null, null],
+  [null, null, "br", "bb", "bq", "bk", null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
