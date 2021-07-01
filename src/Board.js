@@ -23,7 +23,7 @@ function Board() {
     const col = parseInt(e.target.dataset.col);
     if (selected.row < 0 && selected.col < 0) {
       setSelected({ row, col });
-      setTargets(getTargets(board[row][col], { row, col }));
+      setTargets(getTargets(board[row][col], { row, col }, board));
     } else {
       let newBoard = deepCopy(board);
       let piece = newBoard[selected.row][selected.col];

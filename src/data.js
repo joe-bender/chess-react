@@ -42,7 +42,7 @@ export const boardUtil = [
   [null, null, null, null, null, null, null, null],
   [null, null, "br", "bb", "bq", "bk", null, null],
   [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, "wp", null],
   [null, null, null, null, null, null, null, null],
 ];
 
