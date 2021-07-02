@@ -26,12 +26,17 @@ function Board() {
       // do nothing if clicked square is empty
     } else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
       if (turn !== board[row][col].color) {
-        alert("Not your turn!");
         return;
       }
       setSelected({ row, col });
       setTargets(getTargets(board[row][col], { row, col }, board));
     } else {
+      // verify move:
+      if (!targets[row][col]) {
+        setSelected({ row: -1, col: -1 });
+        setTargets(targetsEmpty);
+        return;
+      }
       // make move:
       let newBoard = deepCopy(board);
       let piece = newBoard[selected.row][selected.col];
@@ -66,6 +71,7 @@ function Board() {
           ))}
         </tbody>
       </table>
+      <h2>Turn: {turn}</h2>
     </div>
   );
 }
