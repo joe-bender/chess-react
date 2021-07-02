@@ -99,18 +99,8 @@ function getQueenTargets(piece, loc, board) {
   return targets;
 }
 
-function getKingTargets(piece, loc, board) {
+function jump(piece, loc, board, squares) {
   let targets = deepCopy(targetsEmpty);
-  const squares = [
-    { row: -1, col: -1 },
-    { row: -1, col: 0 },
-    { row: -1, col: 1 },
-    { row: 0, col: -1 },
-    { row: 0, col: 1 },
-    { row: 1, col: -1 },
-    { row: 1, col: 0 },
-    { row: 1, col: 1 },
-  ];
   for (const square of squares) {
     let row = loc.row + square.row;
     let col = loc.col + square.col;
@@ -123,21 +113,32 @@ function getKingTargets(piece, loc, board) {
   return targets;
 }
 
+function getKingTargets(piece, loc, board) {
+  const squares = [
+    { row: -1, col: -1 },
+    { row: -1, col: 0 },
+    { row: -1, col: 1 },
+    { row: 0, col: -1 },
+    { row: 0, col: 1 },
+    { row: 1, col: -1 },
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+  ];
+  return jump(piece, loc, board, squares);
+}
+
 function getKnightTargets(piece, loc, board) {
-  let targets = deepCopy(targetsEmpty);
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      if (
-        ((Math.abs(row - loc.row) === 2 && Math.abs(col - loc.col) === 1) ||
-          (Math.abs(col - loc.col) === 2 && Math.abs(row - loc.row) === 1)) &&
-        // can't target team pieces:
-        (board[row][col] === null || board[row][col].color !== piece.color)
-      ) {
-        targets[row][col] = true;
-      }
-    }
-  }
-  return targets;
+  const squares = [
+    { row: -1, col: -2 },
+    { row: -2, col: -1 },
+    { row: -2, col: 1 },
+    { row: -1, col: 2 },
+    { row: 1, col: -2 },
+    { row: 2, col: -1 },
+    { row: 2, col: 1 },
+    { row: 1, col: 2 },
+  ];
+  return jump(piece, loc, board, squares);
 }
 
 function getPawnTargets(piece, loc, board) {
