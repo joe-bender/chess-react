@@ -21,7 +21,9 @@ function Board() {
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
     const col = parseInt(e.target.dataset.col);
-    if (selected.row < 0 && selected.col < 0) {
+    if (selected.row < 0 && selected.col < 0 && !board[row][col]) {
+      // do nothing
+    } else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
       setSelected({ row, col });
       setTargets(getTargets(board[row][col], { row, col }, board));
     } else {
