@@ -5,156 +5,98 @@ export function deepCopy(board) {
 }
 
 export function getTargets(piece, loc, board) {
-  switch (piece) {
-    case "bk":
+  switch (piece.type) {
+    case "king":
       return getKingTargets(piece, loc, board);
-    case "br":
+    case "rook":
       return getRookTargets(piece, loc, board);
-    case "bb":
+    case "bishop":
       return getBishopTargets(piece, loc, board);
-    case "bq":
+    case "queen":
       return getQueenTargets(piece, loc, board);
-    case "bn":
+    case "knight":
       return getKnightTargets(piece, loc, board);
-    case "bp":
+    case "pawn":
       return getPawnTargets(piece, loc, board);
     default:
       return deepCopy(targetsEmpty);
   }
 }
 
+function seek(piece, loc, board, targets, move) {
+  let row = loc.row + move.row;
+  let col = loc.col + move.col;
+  let getBounds = (move) => {
+    if (move === 1) {
+      return (x) => x < 8;
+    } else if (move === -1) {
+      return (x) => x >= 0;
+    } else {
+      return (x) => true;
+    }
+  };
+  let fBoundsRow = getBounds(move.row);
+  let fBoundsCol = getBounds(move.col);
+  while (fBoundsRow(row) && fBoundsCol(col)) {
+    if (board[row][col]) {
+      if (board[row][col].color !== piece.color) {
+        targets[row][col] = true;
+      }
+      break;
+    }
+    targets[row][col] = true;
+    row += move.row;
+    col += move.col;
+  }
+  return targets;
+}
+
 function getRookTargets(piece, loc, board) {
   let targets = deepCopy(targetsEmpty);
-  let row;
-  let col;
-  // going down:
-  row = loc.row + 1;
-  col = loc.col;
-  while (row < 8) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row++;
-  }
-  // going up:
-  row = loc.row - 1;
-  col = loc.col;
-  while (row >= 0) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row--;
-  }
-  // going right:
-  row = loc.row;
-  col = loc.col + 1;
-  while (col < 8) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    col++;
-  }
-  // going left:
-  row = loc.row;
-  col = loc.col - 1;
-  while (col >= 0) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    col--;
+  let moves = [
+    { row: 1, col: 0 },
+    { row: -1, col: 0 },
+    { row: 0, col: 1 },
+    { row: 0, col: -1 },
+  ];
+  for (const move of moves) {
+    targets = seek(piece, loc, board, targets, move);
   }
   return targets;
 }
 
 function getBishopTargets(piece, loc, board) {
   let targets = deepCopy(targetsEmpty);
-  let row;
-  let col;
-  // going down/right:
-  row = loc.row + 1;
-  col = loc.col + 1;
-  while (row < 8 && col < 8) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row++;
-    col++;
-  }
-  // going down/left:
-  row = loc.row + 1;
-  col = loc.col - 1;
-  while (row < 8 && col >= 0) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row++;
-    col--;
-  }
-  // going up/right:
-  row = loc.row - 1;
-  col = loc.col + 1;
-  while (row >= 0 && col < 8) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row--;
-    col++;
-  }
-  // going up/left:
-  row = loc.row - 1;
-  col = loc.col - 1;
-  while (row >= 0 && col >= 0) {
-    if (board[row][col]) {
-      if (board[row][col][0] === "w") {
-        targets[row][col] = true;
-      }
-      break;
-    }
-    targets[row][col] = true;
-    row--;
-    col--;
+  let moves = [
+    { row: 1, col: 1 },
+    { row: 1, col: -1 },
+    { row: -1, col: 1 },
+    { row: -1, col: -1 },
+  ];
+  for (const move of moves) {
+    targets = seek(piece, loc, board, targets, move);
   }
   return targets;
 }
 
 function getQueenTargets(piece, loc, board) {
-  let rookTargets = getRookTargets(piece, loc, board);
-  let bishopTargets = getBishopTargets(piece, loc, board);
-  let queenTargets = deepCopy(targetsEmpty);
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      queenTargets[row][col] = rookTargets[row][col] || bishopTargets[row][col];
-    }
+  let targets = deepCopy(targetsEmpty);
+  let moves = [
+    // rook moves:
+    { row: 1, col: 0 },
+    { row: -1, col: 0 },
+    { row: 0, col: 1 },
+    { row: 0, col: -1 },
+    // bishop moves:
+    { row: 1, col: 1 },
+    { row: 1, col: -1 },
+    { row: -1, col: 1 },
+    { row: -1, col: -1 },
+  ];
+  for (const move of moves) {
+    targets = seek(piece, loc, board, targets, move);
   }
-  return queenTargets;
+  return targets;
 }
 
 function getKingTargets(piece, loc, board) {
@@ -166,7 +108,7 @@ function getKingTargets(piece, loc, board) {
         Math.abs(col - loc.col) <= 1 &&
         !(row === loc.row && col === loc.col) &&
         // can't target team pieces:
-        (board[row][col] === null || board[row][col][0] === "w")
+        (board[row][col] === null || board[row][col].color !== piece.color)
       ) {
         targets[row][col] = true;
       }
@@ -183,7 +125,7 @@ function getKnightTargets(piece, loc, board) {
         ((Math.abs(row - loc.row) === 2 && Math.abs(col - loc.col) === 1) ||
           (Math.abs(col - loc.col) === 2 && Math.abs(row - loc.row) === 1)) &&
         // can't target team pieces:
-        (board[row][col] === null || board[row][col][0] === "w")
+        (board[row][col] === null || board[row][col].color !== piece.color)
       ) {
         targets[row][col] = true;
       }

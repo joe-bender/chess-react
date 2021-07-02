@@ -11,7 +11,7 @@ import {
 import { deepCopy, getTargets } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardUtil);
+  const [board, setBoard] = useState(boardStart);
   const [targets, setTargets] = useState(targetsEmpty);
   // attacked: all the squares that are attacked by enemy pieces (need one for each side)
   const [attackedByWhite, setAttackedByWhite] = useState(targetsEmpty);
@@ -49,7 +49,7 @@ function Board() {
                   color={(row + col) % 2 === 0 ? "white" : "black"}
                   row={row}
                   col={col}
-                  piece={getPiece[piece]}
+                  piece={piece ? piece.code : null}
                   onClick={selectSquare}
                   selected={row === selected.row && col === selected.col}
                   target={targets[row][col]}
