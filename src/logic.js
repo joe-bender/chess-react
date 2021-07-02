@@ -101,15 +101,21 @@ function getQueenTargets(piece, loc, board) {
 
 function getKingTargets(piece, loc, board) {
   let targets = deepCopy(targetsEmpty);
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      if (
-        Math.abs(row - loc.row) <= 1 &&
-        Math.abs(col - loc.col) <= 1 &&
-        !(row === loc.row && col === loc.col) &&
-        // can't target team pieces:
-        (board[row][col] === null || board[row][col].color !== piece.color)
-      ) {
+  const squares = [
+    { row: -1, col: -1 },
+    { row: -1, col: 0 },
+    { row: -1, col: 1 },
+    { row: 0, col: -1 },
+    { row: 0, col: 1 },
+    { row: 1, col: -1 },
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+  ];
+  for (const square of squares) {
+    let row = loc.row + square.row;
+    let col = loc.col + square.col;
+    if (row >= 0 && row < 8 && col >= 0 && col < 8) {
+      if (board[row][col] === null || board[row][col].color !== piece.color) {
         targets[row][col] = true;
       }
     }
