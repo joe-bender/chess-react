@@ -14,19 +14,25 @@ function Board() {
   const [board, setBoard] = useState(boardStart);
   const [targets, setTargets] = useState(targetsEmpty);
   // attacked: all the squares that are attacked by enemy pieces (need one for each side)
-  const [attackedByWhite, setAttackedByWhite] = useState(targetsEmpty);
-  const [attackedByBlack, setAttackedByBlack] = useState(targetsEmpty);
+  // const [attackedByWhite, setAttackedByWhite] = useState(targetsEmpty);
+  // const [attackedByBlack, setAttackedByBlack] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
+  const [turn, setTurn] = useState("white");
 
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
     const col = parseInt(e.target.dataset.col);
     if (selected.row < 0 && selected.col < 0 && !board[row][col]) {
-      // do nothing
+      // do nothing if clicked square is empty
     } else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
+      if (turn !== board[row][col].color) {
+        alert("Not your turn!");
+        return;
+      }
       setSelected({ row, col });
       setTargets(getTargets(board[row][col], { row, col }, board));
     } else {
+      // make move:
       let newBoard = deepCopy(board);
       let piece = newBoard[selected.row][selected.col];
       newBoard[selected.row][selected.col] = null;
@@ -34,6 +40,7 @@ function Board() {
       setBoard(newBoard);
       setSelected({ row: -1, col: -1 });
       setTargets(targetsEmpty);
+      setTurn((turn) => (turn === "white" ? "black" : "white"));
     }
   };
 
