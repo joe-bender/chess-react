@@ -133,17 +133,32 @@ function getKnightTargets(piece, loc, board) {
   }
   return targets;
 }
+
 function getPawnTargets(piece, loc, board) {
   let targets = deepCopy(targetsEmpty);
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      if (
-        col === loc.col &&
-        row > loc.row &&
-        row <= loc.row + (loc.row === 1 ? 2 : 1)
-      ) {
-        targets[row][col] = true;
+  let forward = piece.color === "black" ? 1 : -1;
+  let startRow = piece.color === "black" ? 1 : 6;
+  // forward movement:
+  if (!board[loc.row + forward][loc.col]) {
+    targets[loc.row + forward][loc.col] = true;
+    if (loc.row === startRow) {
+      if (!board[loc.row + 2 * forward][loc.col]) {
+        targets[loc.row + 2 * forward][loc.col] = true;
       }
+    }
+  }
+  for (const side of [
+    // left attack
+    { bound: (col) => col > 0, dir: -1 },
+    // right attack
+    { bound: (col) => col < 7, dir: 1 },
+  ]) {
+    if (
+      side.bound(loc.col) &&
+      board[loc.row + forward][loc.col + side.dir] &&
+      board[loc.row + forward][loc.col + side.dir].color !== piece.color
+    ) {
+      targets[loc.row + forward][loc.col + side.dir] = true;
     }
   }
   return targets;

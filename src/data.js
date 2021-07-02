@@ -1,18 +1,3 @@
-export const getPiece = {
-  bp: "\u265F",
-  br: "\u265C",
-  bn: "\u265E",
-  bb: "\u265D",
-  bq: "\u265B",
-  bk: "\u265A",
-  wp: "\u2659",
-  wr: "\u2656",
-  wn: "\u2658",
-  wb: "\u2657",
-  wq: "\u2655",
-  wk: "\u2654",
-};
-
 const bp = { color: "black", type: "pawn", code: "\u265F" };
 const br = { color: "black", type: "rook", code: "\u265C" };
 const bn = { color: "black", type: "knight", code: "\u265E" };
