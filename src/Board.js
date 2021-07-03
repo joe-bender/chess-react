@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Square from "./Square";
-import { boardStart, boardUtil, targetsEmpty } from "./data";
+import { boardStart, boardUtil, targetsEmpty, targetsUtil } from "./data";
 import {
   deepCopy,
   getTargets,
@@ -8,16 +8,18 @@ import {
   isThreatened,
   getKingLoc,
   getValidTargets,
+  isInCheck,
+  isMated,
+  anyTrue,
 } from "./logic";
 
 function Board() {
   const [board, setBoard] = useState(boardStart);
   const [targets, setTargets] = useState(targetsEmpty);
-  // attacked: all the squares that are attacked by enemy pieces (need one for each side)
-  // const [attackedByWhite, setAttackedByWhite] = useState(targetsEmpty);
-  // const [attackedByBlack, setAttackedByBlack] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
+  const [check, setCheck] = useState(false);
+  const [winner, setWinner] = useState(null);
 
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
@@ -51,7 +53,15 @@ function Board() {
       setBoard(newBoard);
       setSelected({ row: -1, col: -1 });
       setTargets(targetsEmpty);
-      setTurn((turn) => (turn === "white" ? "black" : "white"));
+      const enemy = turn === "white" ? "black" : "white";
+      if (isInCheck(enemy, newBoard)) {
+        setCheck(true);
+      }
+      if (isMated(enemy, newBoard)) {
+        setWinner(turn);
+        return;
+      }
+      setTurn((turn) => enemy);
     }
   };
 
@@ -77,7 +87,9 @@ function Board() {
           ))}
         </tbody>
       </table>
-      <h2>Turn: {turn}</h2>
+      <p>Turn: {turn}</p>
+      <p>{check ? "Check!" : ""}</p>
+      <p>{winner ? `${turn} wins!` : ""}</p>
     </div>
   );
 }

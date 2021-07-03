@@ -56,12 +56,12 @@ export const targetsEmpty = [
 ];
 
 export const targetsUtil = [
-  [true, false, false, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
+  [false, false, true, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
   [false, false, false, false, false, false, false, false],
-  [false, false, false, false, false, false, false, false],
+  [false, false, false, false, false, false, false, true],
 ];

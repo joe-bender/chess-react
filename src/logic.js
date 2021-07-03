@@ -219,6 +219,33 @@ export function isInCheck(color, board) {
   return locIsThreatened(color, getKingLoc(color, board), board);
 }
 
+export function isMated(color, board) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color === color) {
+        let validTargets = getValidTargets(piece, { row, col }, board);
+        if (anyTrue(validTargets)) {
+          return false;
+        }
+      }
+    }
+  }
+  // if no valid moves found:
+  return true;
+}
+
+export function anyTrue(targets) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      if (targets[row][col]) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export function getKingLoc(color, board) {
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
@@ -231,7 +258,6 @@ export function getKingLoc(color, board) {
 }
 
 export function locIsThreatened(color, loc, board) {
-  let threatened = deepCopy(targetsEmpty);
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       // if it's an enemy piece
