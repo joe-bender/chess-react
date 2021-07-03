@@ -1,14 +1,7 @@
 import { useState } from "react";
 import Square from "./Square";
-import {
-  getPiece,
-  boardStart,
-  boardEmpty,
-  boardUtil,
-  targetsEmpty,
-  targetsUtil,
-} from "./data";
-import { deepCopy, getTargets } from "./logic";
+import { boardStart, boardUtil, targetsEmpty } from "./data";
+import { deepCopy, getTargets, makeMove, isThreatened } from "./logic";
 
 function Board() {
   const [board, setBoard] = useState(boardStart);
@@ -22,26 +15,40 @@ function Board() {
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
     const col = parseInt(e.target.dataset.col);
+    // if selecting an empty square:
     if (selected.row < 0 && selected.col < 0 && !board[row][col]) {
-      // do nothing if clicked square is empty
-    } else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
+      // do nothing
+    }
+    // if selecting a piece to move:
+    else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
       if (turn !== board[row][col].color) {
         return;
       }
       setSelected({ row, col });
       setTargets(getTargets(board[row][col], { row, col }, board));
-    } else {
-      // verify move:
+    }
+    // if selecting a target square:
+    else {
+      // cancel move if selected square not a valid target:
       if (!targets[row][col]) {
         setSelected({ row: -1, col: -1 });
         setTargets(targetsEmpty);
         return;
       }
+      console.log(
+        isThreatened(
+          board[selected.row][selected.col],
+          { row: selected.row, col: selected.col },
+          { row, col },
+          board
+        )
+      );
       // make move:
-      let newBoard = deepCopy(board);
-      let piece = newBoard[selected.row][selected.col];
-      newBoard[selected.row][selected.col] = null;
-      newBoard[row][col] = piece;
+      let newBoard = makeMove(
+        board,
+        { row: selected.row, col: selected.col },
+        { row, col }
+      );
       setBoard(newBoard);
       setSelected({ row: -1, col: -1 });
       setTargets(targetsEmpty);

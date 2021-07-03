@@ -170,3 +170,34 @@ function getPawnTargets(piece, loc, board) {
   }
   return targets;
 }
+
+export function makeMove(board, pieceLoc, target) {
+  let newBoard = deepCopy(board);
+  let piece = newBoard[pieceLoc.row][pieceLoc.col];
+  newBoard[pieceLoc.row][pieceLoc.col] = null;
+  newBoard[target.row][target.col] = piece;
+  return newBoard;
+}
+
+export function isThreatened(piece, startLoc, endLoc, board) {
+  let tryBoard = deepCopy(board);
+  tryBoard[endLoc.row][endLoc.col] = piece;
+  tryBoard[startLoc.row][startLoc.col] = null;
+  return locIsThreatened(piece.color, endLoc, tryBoard);
+}
+
+export function locIsThreatened(color, loc, board) {
+  let threatened = deepCopy(targetsEmpty);
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      // if it's an enemy piece
+      if (board[row][col] && board[row][col].color !== color) {
+        let targets = getTargets(board[row][col], { row, col }, board);
+        if (targets[loc.row][loc.col]) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
