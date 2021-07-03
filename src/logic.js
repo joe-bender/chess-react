@@ -201,3 +201,14 @@ export function locIsThreatened(color, loc, board) {
   }
   return false;
 }
+
+export function getKingLoc(color, board) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color === color && piece.type === "king") {
+        return { row, col };
+      }
+    }
+  }
+}

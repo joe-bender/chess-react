@@ -1,7 +1,13 @@
 import { useState } from "react";
 import Square from "./Square";
 import { boardStart, boardUtil, targetsEmpty } from "./data";
-import { deepCopy, getTargets, makeMove, isThreatened } from "./logic";
+import {
+  deepCopy,
+  getTargets,
+  makeMove,
+  isThreatened,
+  getKingLoc,
+} from "./logic";
 
 function Board() {
   const [board, setBoard] = useState(boardStart);
