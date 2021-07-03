@@ -7,6 +7,7 @@ import {
   makeMove,
   isThreatened,
   getKingLoc,
+  getValidTargets,
 } from "./logic";
 
 function Board() {
@@ -31,7 +32,7 @@ function Board() {
         return;
       }
       setSelected({ row, col });
-      setTargets(getTargets(board[row][col], { row, col }, board));
+      setTargets(getValidTargets(board[row][col], { row, col }, board));
     }
     // if selecting a target square:
     else {
@@ -41,14 +42,6 @@ function Board() {
         setTargets(targetsEmpty);
         return;
       }
-      console.log(
-        isThreatened(
-          board[selected.row][selected.col],
-          { row: selected.row, col: selected.col },
-          { row, col },
-          board
-        )
-      );
       // make move:
       let newBoard = makeMove(
         board,

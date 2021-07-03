@@ -4,23 +4,39 @@ export function deepCopy(board) {
   return board.map((a) => a.slice());
 }
 
+// doesn't consider results of moving to proposed targets
 export function getTargets(piece, loc, board) {
+  let targets;
   switch (piece.type) {
     case "king":
-      return getKingTargets(piece, loc, board);
+      targets = getKingTargets(piece, loc, board);
+      break;
     case "rook":
-      return getRookTargets(piece, loc, board);
+      targets = getRookTargets(piece, loc, board);
+      break;
     case "bishop":
-      return getBishopTargets(piece, loc, board);
+      targets = getBishopTargets(piece, loc, board);
+      break;
     case "queen":
-      return getQueenTargets(piece, loc, board);
+      targets = getQueenTargets(piece, loc, board);
+      break;
     case "knight":
-      return getKnightTargets(piece, loc, board);
+      targets = getKnightTargets(piece, loc, board);
+      break;
     case "pawn":
-      return getPawnTargets(piece, loc, board);
+      targets = getPawnTargets(piece, loc, board);
+      break;
     default:
-      return deepCopy(targetsEmpty);
+      targets = deepCopy(targetsEmpty);
   }
+  return targets;
+}
+
+// prevents moving into self-check positions
+export function getValidTargets(piece, loc, board) {
+  let targets = getTargets(piece, loc, board);
+  targets = validateTargets(piece, board, loc, targets);
+  return targets;
 }
 
 function seek(piece, loc, board, targets, move) {
@@ -171,19 +187,47 @@ function getPawnTargets(piece, loc, board) {
   return targets;
 }
 
-export function makeMove(board, pieceLoc, target) {
+export function validateTargets(piece, board, startLoc, targets) {
+  let validTargets = deepCopy(targets);
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      if (targets[row][col]) {
+        validTargets[row][col] = validateMove(piece.color, board, startLoc, {
+          row,
+          col,
+        });
+      }
+    }
+  }
+  return validTargets;
+}
+
+export function validateMove(color, board, startLoc, endLoc) {
+  let tryBoard = makeMove(board, startLoc, endLoc);
+  return !isInCheck(color, tryBoard);
+}
+
+export function makeMove(board, startLoc, endLoc) {
   let newBoard = deepCopy(board);
-  let piece = newBoard[pieceLoc.row][pieceLoc.col];
-  newBoard[pieceLoc.row][pieceLoc.col] = null;
-  newBoard[target.row][target.col] = piece;
+  let piece = newBoard[startLoc.row][startLoc.col];
+  newBoard[startLoc.row][startLoc.col] = null;
+  newBoard[endLoc.row][endLoc.col] = piece;
   return newBoard;
 }
 
-export function isThreatened(piece, startLoc, endLoc, board) {
-  let tryBoard = deepCopy(board);
-  tryBoard[endLoc.row][endLoc.col] = piece;
-  tryBoard[startLoc.row][startLoc.col] = null;
-  return locIsThreatened(piece.color, endLoc, tryBoard);
+export function isInCheck(color, board) {
+  return locIsThreatened(color, getKingLoc(color, board), board);
+}
+
+export function getKingLoc(color, board) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color === color && piece.type === "king") {
+        return { row, col };
+      }
+    }
+  }
 }
 
 export function locIsThreatened(color, loc, board) {
@@ -200,15 +244,4 @@ export function locIsThreatened(color, loc, board) {
     }
   }
   return false;
-}
-
-export function getKingLoc(color, board) {
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col];
-      if (piece && piece.color === color && piece.type === "king") {
-        return { row, col };
-      }
-    }
-  }
 }
