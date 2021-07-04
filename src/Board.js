@@ -14,7 +14,7 @@ import {
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardStart);
+  const [board, setBoard] = useState(boardUtil);
   const [targets, setTargets] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
@@ -26,10 +26,11 @@ function Board() {
     const col = parseInt(e.target.dataset.col);
     // if selecting an empty square:
     if (selected.row < 0 && selected.col < 0 && !board[row][col]) {
-      // do nothing
+      return;
     }
     // if selecting a piece to move:
     else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
+      // if it's not that color's turn:
       if (turn !== board[row][col].color) {
         return;
       }
@@ -45,10 +46,38 @@ function Board() {
         return;
       }
       // make move:
-      let newBoard = makeMove(
-        board,
-        { row: selected.row, col: selected.col },
-        { row, col }
+      const startLoc = { row: selected.row, col: selected.col };
+      const endLoc = { row, col };
+      let newBoard = deepCopy(board);
+      // handle castling:
+      let piece = board[startLoc.row][startLoc.col];
+      if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
+        if (endLoc.col === 6) {
+          // move right rook:
+          newBoard = makeMove(
+            newBoard,
+            { row: startLoc.row, col: 7 },
+            { row: startLoc.row, col: 5 }
+          );
+        } else if (endLoc.col === 2) {
+          // move right rook:
+          newBoard = makeMove(
+            newBoard,
+            { row: startLoc.row, col: 0 },
+            { row: startLoc.row, col: 3 }
+          );
+        }
+        console.log("castling");
+      }
+
+      if (piece.type === "king" || piece.type === "rook") {
+        piece.hasMoved = true;
+      }
+
+      newBoard = makeMove(
+        newBoard,
+        { row: startLoc.row, col: startLoc.col },
+        { row: endLoc.row, col: endLoc.col }
       );
       setBoard(newBoard);
       setSelected({ row: -1, col: -1 });

@@ -36,6 +36,69 @@ export function getTargets(piece, loc, board) {
 export function getValidTargets(piece, loc, board) {
   let targets = getTargets(piece, loc, board);
   targets = validateTargets(piece, board, loc, targets);
+  // special moves:
+  // castling:
+  if (piece.type === "king" && !piece.hasMoved) {
+    if (piece.color === "black") {
+      // right side:
+      const rightRook = board[0][7];
+      if (
+        rightRook &&
+        rightRook.type === "rook" &&
+        !rightRook.hasMoved &&
+        !board[0][5] &&
+        !board[0][6] &&
+        !locIsThreatened(piece.color, { row: 0, col: 5 }, board)
+        // !locIsThreatened(piece.color, { row: 0, col: 6 }, board)
+      ) {
+        targets[0][6] = true;
+      }
+      // left side:
+      const leftRook = board[0][0];
+      if (
+        leftRook &&
+        leftRook.type === "rook" &&
+        !leftRook.hasMoved &&
+        !board[0][1] &&
+        !board[0][2] &&
+        !board[0][3] &&
+        //!locIsThreatened(piece.color, { row: 0, col: 1 }, board) &&
+        //!locIsThreatened(piece.color, { row: 0, col: 2 }, board) &&
+        !locIsThreatened(piece.color, { row: 0, col: 3 }, board)
+      ) {
+        targets[0][2] = true;
+      }
+    } else {
+      // right side:
+      const rightRook = board[7][7];
+      if (
+        rightRook &&
+        rightRook.type === "rook" &&
+        !rightRook.hasMoved &&
+        !board[7][5] &&
+        !board[7][6] &&
+        !locIsThreatened(piece.color, { row: 7, col: 5 }, board)
+        //!locIsThreatened(piece.color, { row: 7, col: 6 }, board)
+      ) {
+        targets[7][6] = true;
+      }
+      // left side:
+      const leftRook = board[0][0];
+      if (
+        leftRook &&
+        leftRook.type === "rook" &&
+        !leftRook.hasMoved &&
+        !board[7][1] &&
+        !board[7][2] &&
+        !board[7][3] &&
+        //!locIsThreatened(piece.color, { row: 7, col: 1 }, board) &&
+        //!locIsThreatened(piece.color, { row: 7, col: 2 }, board) &&
+        !locIsThreatened(piece.color, { row: 7, col: 3 }, board)
+      ) {
+        targets[7][2] = true;
+      }
+    }
+  }
   return targets;
 }
 
@@ -140,7 +203,8 @@ function getKingTargets(piece, loc, board) {
     { row: 1, col: 0 },
     { row: 1, col: 1 },
   ];
-  return jump(piece, loc, board, squares);
+  let targets = jump(piece, loc, board, squares);
+  return targets;
 }
 
 function getKnightTargets(piece, loc, board) {
