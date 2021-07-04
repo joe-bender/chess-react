@@ -1,21 +1,17 @@
 import { useState } from "react";
 import Square from "./Square";
-import { boardStart, boardUtil, targetsEmpty, targetsUtil } from "./data";
+import { boardStart, boardUtil, targetsEmpty } from "./data";
 import {
   deepCopy,
-  getTargets,
   makeMove,
-  isThreatened,
-  getKingLoc,
   getValidTargets,
   isInCheck,
   isMated,
-  anyTrue,
   resetJustJumped,
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardUtil);
+  const [board, setBoard] = useState(boardStart);
   const [targets, setTargets] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
@@ -40,16 +36,25 @@ function Board() {
     }
     // if selecting a target square:
     else {
+      const startLoc = { row: selected.row, col: selected.col };
+      const endLoc = { row, col };
+      let newBoard = deepCopy(board);
+
+      // debug: delete piece if double-clicked:
+      if (startLoc.row === endLoc.row && startLoc.col === endLoc.col) {
+        newBoard[startLoc.row][startLoc.col] = null;
+        setBoard(newBoard);
+        setSelected({ row: -1, col: -1 });
+        setTargets(targetsEmpty);
+        return;
+      }
+
       // cancel move if selected square not a valid target:
       if (!targets[row][col]) {
         setSelected({ row: -1, col: -1 });
         setTargets(targetsEmpty);
         return;
       }
-      // make move:
-      const startLoc = { row: selected.row, col: selected.col };
-      const endLoc = { row, col };
-      let newBoard = deepCopy(board);
 
       // handle castling:
       let piece = newBoard[startLoc.row][startLoc.col];
@@ -74,7 +79,6 @@ function Board() {
             { row: startLoc.row, col: 3 }
           );
         }
-        console.log("castling");
       }
       // prevent castling after moving relevant pieces:
       if (piece.type === "king" || piece.type === "rook") {
@@ -106,7 +110,6 @@ function Board() {
         ((piece.color === "black" && endLoc.row === 7) ||
           (piece.color === "white" && endLoc.row === 0))
       ) {
-        console.log("promoted");
         newBoard[startLoc.row][startLoc.col] = {
           color: piece.color,
           type: "queen",
@@ -125,6 +128,8 @@ function Board() {
       const enemy = turn === "white" ? "black" : "white";
       if (isInCheck(enemy, newBoard)) {
         setCheck(true);
+      } else {
+        setCheck(false);
       }
       if (isMated(enemy, newBoard)) {
         setWinner(turn);
