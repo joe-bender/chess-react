@@ -15,7 +15,7 @@ import {
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardStart);
+  const [board, setBoard] = useState(boardUtil);
   const [targets, setTargets] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
@@ -50,6 +50,7 @@ function Board() {
       const startLoc = { row: selected.row, col: selected.col };
       const endLoc = { row, col };
       let newBoard = deepCopy(board);
+
       // handle castling:
       let piece = newBoard[startLoc.row][startLoc.col];
       if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
@@ -79,7 +80,8 @@ function Board() {
       if (piece.type === "king" || piece.type === "rook") {
         piece.hasMoved = true;
       }
-      // en passant:
+
+      // handle en passant:
       newBoard = resetJustJumped(newBoard);
       // if the current move is a pawn jump:
       if (Math.abs(endLoc.row - startLoc.row) === 2) {
@@ -95,6 +97,21 @@ function Board() {
       ) {
         // remove captured pawn:
         newBoard[startLoc.row][endLoc.col] = null;
+      }
+
+      // handle pawn promotion:
+      piece = newBoard[startLoc.row][startLoc.col];
+      if (
+        piece.type === "pawn" &&
+        ((piece.color === "black" && endLoc.row === 7) ||
+          (piece.color === "white" && endLoc.row === 0))
+      ) {
+        console.log("promoted");
+        newBoard[startLoc.row][startLoc.col] = {
+          color: piece.color,
+          type: "queen",
+          code: piece.color === "white" ? "\u2655" : "\u265B",
+        };
       }
 
       newBoard = makeMove(

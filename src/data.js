@@ -54,14 +54,14 @@ export const boardEmpty = [
 ];
 
 export const boardUtil = [
-  [br(), null, null, null, bk, null, null, br()],
-  [bp, bp, bp, null, bp, null, null, bp],
+  [bk, null, null, null, null, null, null, null],
+  [null, null, null, null, null, bp(), bp(), bp()],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [wp, wp, wp, wp, wp, wp, wp, wp],
-  [wr, null, null, null, wk, null, null, wr],
+  [wp(), wp(), wp(), wp(), wp(), null, null, null],
+  [wr(), wn, wb, wq, wk, null, null, null],
 ];
 
 export const targetsEmpty = [
