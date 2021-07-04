@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Square from "./Square";
-import { boardStart, boardUtil, targetsEmpty } from "./data";
+import PromoChoice from "./PromoChoice";
+import * as data from "./data";
 import {
   deepCopy,
   makeMove,
@@ -9,16 +10,17 @@ import {
   isMated,
   handleCastling,
   handleEnPassant,
-  handlePromotion,
+  needsPromotion,
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardStart);
-  const [targets, setTargets] = useState(targetsEmpty);
+  const [board, setBoard] = useState(data.boardUtil);
+  const [targets, setTargets] = useState(data.targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
   const [check, setCheck] = useState(false);
   const [winner, setWinner] = useState(null);
+  const [promoChoice, setPromoChoice] = useState("queen");
 
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
@@ -62,8 +64,13 @@ function Board() {
     }
     newBoard = handleCastling(newBoard, startLoc, endLoc);
     newBoard = handleEnPassant(newBoard, startLoc, endLoc);
-    newBoard = handlePromotion(newBoard, startLoc, endLoc);
+    // newBoard = handlePromotion(newBoard, startLoc, endLoc);
     newBoard = makeMove(newBoard, startLoc, endLoc);
+    // pawn promotion:
+    let promoLoc = needsPromotion(board, startLoc, endLoc);
+    if (promoLoc) {
+      newBoard[promoLoc.row][promoLoc.col] = getPromoChoice(turn);
+    }
     setBoard(newBoard);
     const enemy = turn === "white" ? "black" : "white";
     if (isInCheck(enemy, newBoard)) {
@@ -80,7 +87,41 @@ function Board() {
 
   const resetSelection = () => {
     setSelected({ row: -1, col: -1 });
-    setTargets(targetsEmpty);
+    setTargets(data.targetsEmpty);
+  };
+
+  const getPromoChoice = (color) => {
+    if (color === "white") {
+      switch (promoChoice) {
+        case "queen":
+          return data.wq();
+        case "rook":
+          return data.wr();
+        case "bishop":
+          return data.wb();
+        case "knight":
+          return data.wn();
+        default:
+          return data.wq();
+      }
+    } else {
+      switch (promoChoice) {
+        case "queen":
+          return data.bq();
+        case "rook":
+          return data.br();
+        case "bishop":
+          return data.bb();
+        case "knight":
+          return data.bn();
+        default:
+          return data.bq();
+      }
+    }
+  };
+
+  const handlePromoPick = (choice) => {
+    setPromoChoice(choice);
   };
 
   return (
@@ -108,6 +149,8 @@ function Board() {
       <p>Turn: {turn}</p>
       <p>{check ? "Check!" : ""}</p>
       <p>{winner ? `${turn} wins!` : ""}</p>
+      <p>Promo choice: {promoChoice}</p>
+      <PromoChoice onChange={handlePromoPick} />
     </div>
   );
 }

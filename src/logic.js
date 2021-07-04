@@ -1,4 +1,4 @@
-import { targetsEmpty } from "./data";
+import * as data from "./data";
 
 export function deepCopy(board) {
   return board.map((a) => a.slice());
@@ -27,7 +27,7 @@ export function getTargets(piece, loc, board) {
       targets = getPawnTargets(piece, loc, board);
       break;
     default:
-      targets = deepCopy(targetsEmpty);
+      targets = deepCopy(data.targetsEmpty);
   }
   return targets;
 }
@@ -104,7 +104,7 @@ function seek(piece, loc, board, targets, move) {
 }
 
 function getRookTargets(piece, loc, board) {
-  let targets = deepCopy(targetsEmpty);
+  let targets = deepCopy(data.targetsEmpty);
   let moves = [
     { row: 1, col: 0 },
     { row: -1, col: 0 },
@@ -118,7 +118,7 @@ function getRookTargets(piece, loc, board) {
 }
 
 function getBishopTargets(piece, loc, board) {
-  let targets = deepCopy(targetsEmpty);
+  let targets = deepCopy(data.targetsEmpty);
   let moves = [
     { row: 1, col: 1 },
     { row: 1, col: -1 },
@@ -132,7 +132,7 @@ function getBishopTargets(piece, loc, board) {
 }
 
 function getQueenTargets(piece, loc, board) {
-  let targets = deepCopy(targetsEmpty);
+  let targets = deepCopy(data.targetsEmpty);
   let moves = [
     // rook moves:
     { row: 1, col: 0 },
@@ -152,7 +152,7 @@ function getQueenTargets(piece, loc, board) {
 }
 
 function jump(piece, loc, board, squares) {
-  let targets = deepCopy(targetsEmpty);
+  let targets = deepCopy(data.targetsEmpty);
   for (const square of squares) {
     let row = loc.row + square.row;
     let col = loc.col + square.col;
@@ -195,7 +195,7 @@ function getKnightTargets(piece, loc, board) {
 }
 
 function getPawnTargets(piece, loc, board) {
-  let targets = deepCopy(targetsEmpty);
+  let targets = deepCopy(data.targetsEmpty);
   let forward = piece.color === "black" ? 1 : -1;
   let startRow = piece.color === "black" ? 1 : 6;
   // forward movement:
@@ -373,8 +373,6 @@ export function handleEnPassant(board, startLoc, endLoc) {
   if (
     // if the moving piece is a pawn:
     newBoard[startLoc.row][startLoc.col].type === "pawn" &&
-    // if the piece to be captured is a pawn
-    newBoard[startLoc.row][endLoc.col].type === "pawn" &&
     // if moving diagonally:
     Math.abs(endLoc.row - startLoc.row) === 1 &&
     Math.abs(endLoc.col - startLoc.col) === 1 &&
@@ -387,7 +385,7 @@ export function handleEnPassant(board, startLoc, endLoc) {
   return newBoard;
 }
 
-export function handlePromotion(board, startLoc, endLoc) {
+export function needsPromotion(board, startLoc, endLoc) {
   let newBoard = deepCopy(board);
   let piece = newBoard[startLoc.row][startLoc.col];
   if (
@@ -395,11 +393,7 @@ export function handlePromotion(board, startLoc, endLoc) {
     ((piece.color === "black" && endLoc.row === 7) ||
       (piece.color === "white" && endLoc.row === 0))
   ) {
-    newBoard[startLoc.row][startLoc.col] = {
-      color: piece.color,
-      type: "queen",
-      code: piece.color === "white" ? "\u2655" : "\u265B",
-    };
+    return endLoc;
   }
-  return newBoard;
+  return false;
 }
