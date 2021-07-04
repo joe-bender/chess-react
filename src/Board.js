@@ -7,7 +7,9 @@ import {
   getValidTargets,
   isInCheck,
   isMated,
-  resetJustJumped,
+  handleCastling,
+  handleEnPassant,
+  handlePromotion,
 } from "./logic";
 
 function Board() {
@@ -21,122 +23,64 @@ function Board() {
   const selectSquare = (e) => {
     const row = parseInt(e.target.dataset.row);
     const col = parseInt(e.target.dataset.col);
-    // if selecting an empty square:
-    if (selected.row < 0 && selected.col < 0 && !board[row][col]) {
-      return;
-    }
-    // if selecting a piece to move:
-    else if (selected.row < 0 && selected.col < 0 && board[row][col]) {
-      // if it's not that color's turn:
-      if (turn !== board[row][col].color) {
+    // if no piece has been selected yet:
+    if (selected.row < 0 && selected.col < 0) {
+      // if selecting an empty square:
+      if (!board[row][col]) {
         return;
       }
-      setSelected({ row, col });
-      setTargets(getValidTargets(board[row][col], { row, col }, board));
-    }
-    // if selecting a target square:
-    else {
+      // if selecting a piece to move:
+      if (board[row][col]) {
+        if (turn === board[row][col].color) {
+          setSelected({ row, col });
+          setTargets(getValidTargets(board[row][col], { row, col }, board));
+        }
+        return;
+      }
+    } else {
+      // if selecting a target square:
       const startLoc = { row: selected.row, col: selected.col };
       const endLoc = { row, col };
-      let newBoard = deepCopy(board);
-
-      // debug: delete piece if double-clicked:
-      if (startLoc.row === endLoc.row && startLoc.col === endLoc.col) {
-        newBoard[startLoc.row][startLoc.col] = null;
-        setBoard(newBoard);
-        setSelected({ row: -1, col: -1 });
-        setTargets(targetsEmpty);
-        return;
-      }
-
-      // cancel move if selected square not a valid target:
-      if (!targets[row][col]) {
-        setSelected({ row: -1, col: -1 });
-        setTargets(targetsEmpty);
-        return;
-      }
-
-      // handle castling:
-      let piece = newBoard[startLoc.row][startLoc.col];
-      if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
-        piece.hasMoved = true;
-        if (endLoc.col === 6) {
-          // mark right rook as moved:
-          newBoard[startLoc.row][7].hasMoved = true;
-          // move right rook:
-          newBoard = makeMove(
-            newBoard,
-            { row: startLoc.row, col: 7 },
-            { row: startLoc.row, col: 5 }
-          );
-        } else if (endLoc.col === 2) {
-          // mark left rook as moved:
-          newBoard[startLoc.row][0].hasMoved = true;
-          // move left rook:
-          newBoard = makeMove(
-            newBoard,
-            { row: startLoc.row, col: 0 },
-            { row: startLoc.row, col: 3 }
-          );
-        }
-      }
-      // prevent castling after moving relevant pieces:
-      if (piece.type === "king" || piece.type === "rook") {
-        piece.hasMoved = true;
-      }
-
-      // handle en passant:
-      newBoard = resetJustJumped(newBoard);
-      // if the current move is a pawn jump:
-      if (Math.abs(endLoc.row - startLoc.row) === 2) {
-        newBoard[startLoc.row][startLoc.col].justJumped = true;
-      }
-      // if current move is en-passant attack:
-      if (
-        // if moving diagonally:
-        Math.abs(endLoc.row - startLoc.row) === 1 &&
-        Math.abs(endLoc.col - startLoc.col) === 1 &&
-        // if endLoc is empty
-        !newBoard[endLoc.row][endLoc.col]
-      ) {
-        // remove captured pawn:
-        newBoard[startLoc.row][endLoc.col] = null;
-      }
-
-      // handle pawn promotion:
-      piece = newBoard[startLoc.row][startLoc.col];
-      if (
-        piece.type === "pawn" &&
-        ((piece.color === "black" && endLoc.row === 7) ||
-          (piece.color === "white" && endLoc.row === 0))
-      ) {
-        newBoard[startLoc.row][startLoc.col] = {
-          color: piece.color,
-          type: "queen",
-          code: piece.color === "white" ? "\u2655" : "\u265B",
-        };
-      }
-
-      newBoard = makeMove(
-        newBoard,
-        { row: startLoc.row, col: startLoc.col },
-        { row: endLoc.row, col: endLoc.col }
-      );
-      setBoard(newBoard);
-      setSelected({ row: -1, col: -1 });
-      setTargets(targetsEmpty);
-      const enemy = turn === "white" ? "black" : "white";
-      if (isInCheck(enemy, newBoard)) {
-        setCheck(true);
-      } else {
-        setCheck(false);
-      }
-      if (isMated(enemy, newBoard)) {
-        setWinner(turn);
-        return;
-      }
-      setTurn((turn) => enemy);
+      move(board, startLoc, endLoc);
+      resetSelection();
     }
+  };
+
+  const move = (board, startLoc, endLoc) => {
+    let newBoard = deepCopy(board);
+
+    // debug: delete piece if double-clicked:
+    // if (startLoc.row === endLoc.row && startLoc.col === endLoc.col) {
+    //   newBoard[startLoc.row][startLoc.col] = null;
+    //   setBoard(newBoard);
+    //   return;
+    // }
+
+    // cancel move if selected square not a valid target:
+    if (!targets[endLoc.row][endLoc.col]) {
+      return;
+    }
+    newBoard = handleCastling(newBoard, startLoc, endLoc);
+    newBoard = handleEnPassant(newBoard, startLoc, endLoc);
+    newBoard = handlePromotion(newBoard, startLoc, endLoc);
+    newBoard = makeMove(newBoard, startLoc, endLoc);
+    setBoard(newBoard);
+    const enemy = turn === "white" ? "black" : "white";
+    if (isInCheck(enemy, newBoard)) {
+      setCheck(true);
+    } else {
+      setCheck(false);
+    }
+    if (isMated(enemy, newBoard)) {
+      setWinner(turn);
+      return;
+    }
+    setTurn((turn) => enemy);
+  };
+
+  const resetSelection = () => {
+    setSelected({ row: -1, col: -1 });
+    setTargets(targetsEmpty);
   };
 
   return (

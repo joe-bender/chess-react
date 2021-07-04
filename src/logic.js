@@ -35,37 +35,42 @@ export function getTargets(piece, loc, board) {
 // prevents moving into self-check positions
 export function getValidTargets(piece, loc, board) {
   let targets = getTargets(piece, loc, board);
-  targets = validateTargets(piece, board, loc, targets);
-  // special moves:
-  // castling:
   if (piece.type === "king" && !piece.hasMoved) {
-    let row = piece.color === "black" ? 0 : 7;
-    let rook;
-    // right side:
-    rook = board[row][7];
-    if (
-      rook &&
-      rook.type === "rook" &&
-      !rook.hasMoved &&
-      !board[row][5] &&
-      !board[row][6] &&
-      !locIsThreatened(piece.color, { row, col: 5 }, board)
-    ) {
-      targets[row][6] = true;
-    }
-    // left side:
-    rook = board[row][0];
-    if (
-      rook &&
-      rook.type === "rook" &&
-      !rook.hasMoved &&
-      !board[row][1] &&
-      !board[row][2] &&
-      !board[row][3] &&
-      !locIsThreatened(piece.color, { row, col: 3 }, board)
-    ) {
-      targets[row][2] = true;
-    }
+    getCastlingTargets(piece, loc, board, targets);
+  }
+  targets = validateTargets(piece, board, loc, targets);
+  return targets;
+}
+
+function getCastlingTargets(piece, loc, board, targets) {
+  let row = piece.color === "black" ? 0 : 7;
+  let rook;
+  // right side:
+  rook = board[row][7];
+  if (
+    rook &&
+    rook.type === "rook" &&
+    !rook.hasMoved &&
+    !board[row][5] &&
+    !board[row][6] &&
+    !locIsThreatened(piece.color, { row, col: 5 }, board) &&
+    !locIsThreatened(piece.color, { row, col: 6 }, board)
+  ) {
+    targets[row][6] = true;
+  }
+  // left side:
+  rook = board[row][0];
+  if (
+    rook &&
+    rook.type === "rook" &&
+    !rook.hasMoved &&
+    !board[row][1] &&
+    !board[row][2] &&
+    !board[row][3] &&
+    !locIsThreatened(piece.color, { row, col: 2 }, board) &&
+    !locIsThreatened(piece.color, { row, col: 3 }, board)
+  ) {
+    targets[row][2] = true;
   }
   return targets;
 }
@@ -237,6 +242,7 @@ export function resetJustJumped(board) {
   return newBoard;
 }
 
+// remove any targets that result in self-check:
 export function validateTargets(piece, board, startLoc, targets) {
   let validTargets = deepCopy(targets);
   for (let row = 0; row < 8; row++) {
@@ -252,6 +258,7 @@ export function validateTargets(piece, board, startLoc, targets) {
   return validTargets;
 }
 
+// see if move doesn't end in self-check:
 export function validateMove(color, board, startLoc, endLoc) {
   let tryBoard = makeMove(board, startLoc, endLoc);
   return !isInCheck(color, tryBoard);
@@ -266,7 +273,8 @@ export function makeMove(board, startLoc, endLoc) {
 }
 
 export function isInCheck(color, board) {
-  return locIsThreatened(color, getKingLoc(color, board), board);
+  const loc = getKingLoc(color, board);
+  return locIsThreatened(color, loc, board);
 }
 
 export function isMated(color, board) {
@@ -320,4 +328,78 @@ export function locIsThreatened(color, loc, board) {
     }
   }
   return false;
+}
+
+export function handleCastling(board, startLoc, endLoc) {
+  let newBoard = deepCopy(board);
+  let piece = newBoard[startLoc.row][startLoc.col];
+  if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
+    piece.hasMoved = true;
+    if (endLoc.col === 6) {
+      // mark right rook as moved:
+      newBoard[startLoc.row][7].hasMoved = true;
+      // move right rook:
+      newBoard = makeMove(
+        newBoard,
+        { row: startLoc.row, col: 7 },
+        { row: startLoc.row, col: 5 }
+      );
+    } else if (endLoc.col === 2) {
+      // mark left rook as moved:
+      newBoard[startLoc.row][0].hasMoved = true;
+      // move left rook:
+      newBoard = makeMove(
+        newBoard,
+        { row: startLoc.row, col: 0 },
+        { row: startLoc.row, col: 3 }
+      );
+    }
+  }
+  // prevent castling after moving relevant pieces:
+  if (piece.type === "king" || piece.type === "rook") {
+    piece.hasMoved = true;
+  }
+  return newBoard;
+}
+
+export function handleEnPassant(board, startLoc, endLoc) {
+  let newBoard = deepCopy(board);
+  newBoard = resetJustJumped(newBoard);
+  // if the current move is a pawn jump:
+  if (Math.abs(endLoc.row - startLoc.row) === 2) {
+    newBoard[startLoc.row][startLoc.col].justJumped = true;
+  }
+  // if current move is en-passant attack:
+  if (
+    // if the moving piece is a pawn:
+    newBoard[startLoc.row][startLoc.col].type === "pawn" &&
+    // if the piece to be captured is a pawn
+    newBoard[startLoc.row][endLoc.col].type === "pawn" &&
+    // if moving diagonally:
+    Math.abs(endLoc.row - startLoc.row) === 1 &&
+    Math.abs(endLoc.col - startLoc.col) === 1 &&
+    // if endLoc is empty
+    !newBoard[endLoc.row][endLoc.col]
+  ) {
+    // remove captured pawn:
+    newBoard[startLoc.row][endLoc.col] = null;
+  }
+  return newBoard;
+}
+
+export function handlePromotion(board, startLoc, endLoc) {
+  let newBoard = deepCopy(board);
+  let piece = newBoard[startLoc.row][startLoc.col];
+  if (
+    piece.type === "pawn" &&
+    ((piece.color === "black" && endLoc.row === 7) ||
+      (piece.color === "white" && endLoc.row === 0))
+  ) {
+    newBoard[startLoc.row][startLoc.col] = {
+      color: piece.color,
+      type: "queen",
+      code: piece.color === "white" ? "\u2655" : "\u265B",
+    };
+  }
+  return newBoard;
 }
