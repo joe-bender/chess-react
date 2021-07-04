@@ -1,4 +1,9 @@
-const bp = { color: "black", type: "pawn", code: "\u265F" };
+const bp = () => ({
+  color: "black",
+  type: "pawn",
+  code: "\u265F",
+  justJumped: false,
+});
 const br = () => ({
   color: "black",
   type: "rook",
@@ -9,8 +14,18 @@ const bn = { color: "black", type: "knight", code: "\u265E" };
 const bb = { color: "black", type: "bishop", code: "\u265D" };
 const bq = { color: "black", type: "queen", code: "\u265B" };
 const bk = { color: "black", type: "king", code: "\u265A", hasMoved: false };
-const wp = { color: "white", type: "pawn", code: "\u2659" };
-const wr = { color: "white", type: "rook", code: "\u2656", hasMoved: false };
+const wp = () => ({
+  color: "white",
+  type: "pawn",
+  code: "\u2659",
+  justJumped: false,
+});
+const wr = () => ({
+  color: "white",
+  type: "rook",
+  code: "\u2656",
+  hasMoved: false,
+});
 const wn = { color: "white", type: "knight", code: "\u2658" };
 const wb = { color: "white", type: "bishop", code: "\u2657" };
 const wq = { color: "white", type: "queen", code: "\u2655" };
@@ -18,13 +33,13 @@ const wk = { color: "white", type: "king", code: "\u2654", hasMoved: false };
 
 export const boardStart = [
   [br(), bn, bb, bq, bk, bb, bn, br()],
-  [bp, bp, bp, bp, bp, bp, bp, bp],
+  [bp(), bp(), bp(), bp(), bp(), bp(), bp(), bp()],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [wp, wp, wp, wp, wp, wp, wp, wp],
-  [wr, wn, wb, wq, wk, wb, wn, wr],
+  [wp(), wp(), wp(), wp(), wp(), wp(), wp(), wp()],
+  [wr(), wn, wb, wq, wk, wb, wn, wr()],
 ];
 
 export const boardEmpty = [

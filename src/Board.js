@@ -11,10 +11,11 @@ import {
   isInCheck,
   isMated,
   anyTrue,
+  resetJustJumped,
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(boardUtil);
+  const [board, setBoard] = useState(boardStart);
   const [targets, setTargets] = useState(targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
@@ -50,9 +51,12 @@ function Board() {
       const endLoc = { row, col };
       let newBoard = deepCopy(board);
       // handle castling:
-      let piece = board[startLoc.row][startLoc.col];
+      let piece = newBoard[startLoc.row][startLoc.col];
       if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
+        piece.hasMoved = true;
         if (endLoc.col === 6) {
+          // mark right rook as moved:
+          newBoard[startLoc.row][7].hasMoved = true;
           // move right rook:
           newBoard = makeMove(
             newBoard,
@@ -60,7 +64,9 @@ function Board() {
             { row: startLoc.row, col: 5 }
           );
         } else if (endLoc.col === 2) {
-          // move right rook:
+          // mark left rook as moved:
+          newBoard[startLoc.row][0].hasMoved = true;
+          // move left rook:
           newBoard = makeMove(
             newBoard,
             { row: startLoc.row, col: 0 },
@@ -69,9 +75,26 @@ function Board() {
         }
         console.log("castling");
       }
-
+      // prevent castling after moving relevant pieces:
       if (piece.type === "king" || piece.type === "rook") {
         piece.hasMoved = true;
+      }
+      // en passant:
+      newBoard = resetJustJumped(newBoard);
+      // if the current move is a pawn jump:
+      if (Math.abs(endLoc.row - startLoc.row) === 2) {
+        newBoard[startLoc.row][startLoc.col].justJumped = true;
+      }
+      // if current move is en-passant attack:
+      if (
+        // if moving diagonally:
+        Math.abs(endLoc.row - startLoc.row) === 1 &&
+        Math.abs(endLoc.col - startLoc.col) === 1 &&
+        // if endLoc is empty
+        !newBoard[endLoc.row][endLoc.col]
+      ) {
+        // remove captured pawn:
+        newBoard[startLoc.row][endLoc.col] = null;
       }
 
       newBoard = makeMove(

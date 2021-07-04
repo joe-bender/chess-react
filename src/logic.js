@@ -99,6 +99,11 @@ export function getValidTargets(piece, loc, board) {
       }
     }
   }
+  // en passant:
+  if (piece.type === "pawn") {
+    if (piece.color === "black") {
+    }
+  }
   return targets;
 }
 
@@ -241,14 +246,32 @@ function getPawnTargets(piece, loc, board) {
     { bound: (col) => col < 7, dir: 1 },
   ]) {
     if (
-      side.bound(loc.col) &&
-      board[loc.row + forward][loc.col + side.dir] &&
-      board[loc.row + forward][loc.col + side.dir].color !== piece.color
+      (side.bound(loc.col) &&
+        // normal attack
+        board[loc.row + forward][loc.col + side.dir] &&
+        board[loc.row + forward][loc.col + side.dir].color !== piece.color) ||
+      // en passant
+      (board[loc.row][loc.col + side.dir] &&
+        board[loc.row][loc.col + side.dir].color !== piece.color &&
+        board[loc.row][loc.col + side.dir].type === "pawn" &&
+        board[loc.row][loc.col + side.dir].justJumped)
     ) {
       targets[loc.row + forward][loc.col + side.dir] = true;
     }
   }
   return targets;
+}
+
+export function resetJustJumped(board) {
+  let newBoard = deepCopy(board);
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      if (newBoard[row][col] && newBoard[row][col].type === "pawn") {
+        newBoard[row][col].justJumped = false;
+      }
+    }
+  }
+  return newBoard;
 }
 
 export function validateTargets(piece, board, startLoc, targets) {
