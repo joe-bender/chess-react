@@ -1,3 +1,33 @@
+export const getPiece = (color, type) => {
+  if (color === "white") {
+    switch (type) {
+      case "queen":
+        return wq();
+      case "rook":
+        return wr();
+      case "bishop":
+        return wb();
+      case "knight":
+        return wn();
+      default:
+        return wq();
+    }
+  } else {
+    switch (type) {
+      case "queen":
+        return bq();
+      case "rook":
+        return br();
+      case "bishop":
+        return bb();
+      case "knight":
+        return bn();
+      default:
+        return bq();
+    }
+  }
+};
+
 export const bp = () => ({
   color: "black",
   type: "pawn",

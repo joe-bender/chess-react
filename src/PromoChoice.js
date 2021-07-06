@@ -8,6 +8,7 @@ function PromoChoice(props) {
 
   return (
     <div>
+      <h3>Choose a piece:</h3>
       <button type="button" value="queen" onClick={handleChange}>
         Queen
       </button>
