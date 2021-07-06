@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Square from "./Square";
 import PromoChoice from "./PromoChoice";
+import Board from "./Board";
 import * as data from "./data";
 import * as logic from "./logic";
 
-function Board() {
+function Chess() {
   const [board, setBoard] = useState(data.boardStart);
   const [targets, setTargets] = useState(data.targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
@@ -119,26 +119,12 @@ function Board() {
 
   return (
     <div>
-      <table>
-        <tbody>
-          {Array.from({ length: 8 }, (v, i) => i).map((row) => (
-            <tr key={row}>
-              {board[row].map((piece, col) => (
-                <Square
-                  key={col}
-                  color={(row + col) % 2 === 0 ? "white" : "black"}
-                  row={row}
-                  col={col}
-                  piece={piece ? piece.code : null}
-                  onClick={selectSquare}
-                  selected={row === selected.row && col === selected.col}
-                  target={targets[row][col]}
-                />
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Board
+        board={board}
+        onClick={selectSquare}
+        selected={selected}
+        targets={targets}
+      />
       {choosingPromo && <PromoChoice onChange={handlePromoPick} />}
       <p>{!winner ? `Turn: ${turn}` : ""}</p>
       <p>{check && !winner ? "Check!" : ""}</p>
@@ -150,4 +136,4 @@ function Board() {
   );
 }
 
-export default Board;
+export default Chess;

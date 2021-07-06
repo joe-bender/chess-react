@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 function PromoChoice(props) {
   const handleChange = (e) => {
     const choice = e.target.value;
