@@ -4,26 +4,44 @@ table {
 }
 
 td {
+  margin: 0;
+  padding: 0;
   border: 1px solid black;
-  width: 50px;
-  height: 50px;
-  font-size: 35px;
+  width: 60px;
+  height: 60px;
+  position: relative;
+  top: 0;
+  left: 0;
+  font-size: 50px;
   text-align: center;
+  vertical-align: middle;
   user-select: none;
 }
 
-td.white {
-  background-color: rgb(170, 154, 118);
+td.whiteSquare {
+  background-color: rgb(148, 148, 148);
 }
 
-td.black {
-  background-color: rgb(138, 97, 49);
-}
-
-td.selected {
-  background-color: aqua;
+td.blackSquare {
+  background-color: rgb(108, 108, 108);
 }
 
 td.target {
-  background-color: rgb(75, 253, 134);
+  background-color: tomato;
+}
+
+td.white {
+  color: white;
+}
+
+td.black {
+  color: black;
+}
+
+td.selected {
+  color: rgb(98, 252, 98);
+}
+td.check {
+  background-color: rgb(241, 243, 108);
+  color: rgb(255, 38, 0);
 }

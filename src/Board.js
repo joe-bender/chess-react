@@ -9,15 +9,21 @@ function Board(props) {
             {props.board[row].map((piece, col) => (
               <Square
                 key={col}
-                color={(row + col) % 2 === 0 ? "white" : "black"}
+                squareColor={
+                  (row + col) % 2 === 0 ? "whiteSquare" : "blackSquare"
+                }
                 row={row}
                 col={col}
-                piece={piece ? piece.code : null}
-                onClick={props.onClick}
+                piece={piece}
+                check={props.check}
+                turn={props.turn}
                 selected={
                   row === props.selected.row && col === props.selected.col
                 }
                 target={props.targets[row][col]}
+                onClick={props.onClick}
+                onMouseEnter={props.onMouseEnter}
+                onMouseLeave={props.onMouseLeave}
               />
             ))}
           </tr>

@@ -117,13 +117,40 @@ function Chess() {
     setWinner(null);
   };
 
+  // show the hovered piece's info:
+  const logPiece = (e) => {
+    // const row = parseInt(e.target.dataset.row);
+    // const col = parseInt(e.target.dataset.col);
+    // console.log(board[row][col]);
+  };
+
+  const showTargets = (e) => {
+    if (selected.row < 0 && selected.col < 0) {
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      if (board[row][col] && board[row][col].color === turn) {
+        setTargets(logic.getValidTargets(board[row][col], { row, col }, board));
+      }
+    }
+  };
+
+  const hideTargets = () => {
+    if (selected.row < 0 && selected.col < 0) {
+      setTargets(data.targetsEmpty);
+    }
+  };
+
   return (
     <div>
       <Board
         board={board}
+        check={check}
+        turn={turn}
         onClick={selectSquare}
         selected={selected}
         targets={targets}
+        onMouseEnter={showTargets}
+        onMouseLeave={hideTargets}
       />
       {choosingPromo && <PromoChoice onChange={handlePromoPick} />}
       <p>{!winner ? `Turn: ${turn}` : ""}</p>
