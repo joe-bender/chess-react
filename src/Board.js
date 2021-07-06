@@ -14,15 +14,20 @@ import {
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(data.boardStart);
+  const [board, setBoard] = useState(data.boardUtil);
   const [targets, setTargets] = useState(data.targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");
   const [check, setCheck] = useState(false);
   const [winner, setWinner] = useState(null);
-  const [promoChoice, setPromoChoice] = useState("queen");
+  const [choosingPromo, setChoosingPromo] = useState(false);
+  const [promoLoc, setPromoLoc] = useState(null);
 
   const selectSquare = (e) => {
+    // don't allow selections if player is still choosing a promo piece:
+    if (choosingPromo) {
+      return;
+    }
     // can't select piece to move if game is over:
     if (winner) {
       return;
@@ -71,9 +76,14 @@ function Board() {
     // newBoard = handlePromotion(newBoard, startLoc, endLoc);
     newBoard = makeMove(newBoard, startLoc, endLoc);
     // pawn promotion:
-    let promoLoc = needsPromotion(board, startLoc, endLoc);
-    if (promoLoc) {
-      newBoard[promoLoc.row][promoLoc.col] = getPromoChoice(turn);
+    let pLoc = needsPromotion(board, startLoc, endLoc);
+    if (pLoc) {
+      setPromoLoc(pLoc);
+      setChoosingPromo(true);
+      newBoard[pLoc.row][pLoc.col] = { code: "?" };
+      setBoard(newBoard);
+      resetSelection();
+      return;
     }
     setBoard(newBoard);
     const enemy = turn === "white" ? "black" : "white";
@@ -94,9 +104,9 @@ function Board() {
     setTargets(data.targetsEmpty);
   };
 
-  const getPromoChoice = (color) => {
+  const getPromoChoice = (color, choice) => {
     if (color === "white") {
-      switch (promoChoice) {
+      switch (choice) {
         case "queen":
           return data.wq();
         case "rook":
@@ -109,7 +119,7 @@ function Board() {
           return data.wq();
       }
     } else {
-      switch (promoChoice) {
+      switch (choice) {
         case "queen":
           return data.bq();
         case "rook":
@@ -125,7 +135,21 @@ function Board() {
   };
 
   const handlePromoPick = (choice) => {
-    setPromoChoice(choice);
+    let newBoard = deepCopy(board);
+    newBoard[promoLoc.row][promoLoc.col] = getPromoChoice(turn, choice);
+    setBoard(newBoard);
+    setChoosingPromo(false);
+    const enemy = turn === "white" ? "black" : "white";
+    if (isInCheck(enemy, newBoard)) {
+      setCheck(true);
+    } else {
+      setCheck(false);
+    }
+    if (isMated(enemy, newBoard)) {
+      setWinner(turn);
+      return;
+    }
+    setTurn((turn) => enemy);
   };
 
   const newGame = () => {
@@ -138,6 +162,7 @@ function Board() {
 
   return (
     <div>
+      {choosingPromo && <PromoChoice onChange={handlePromoPick} />}
       <table>
         <tbody>
           {Array.from({ length: 8 }, (v, i) => i).map((row) => (
@@ -161,8 +186,6 @@ function Board() {
       <p>{!winner ? `Turn: ${turn}` : ""}</p>
       <p>{check && !winner ? "Check!" : ""}</p>
       <p>{winner ? `${winner} wins!` : ""}</p>
-      <p>Promo choice: {promoChoice}</p>
-      <PromoChoice onChange={handlePromoPick} />
       <button type="button" onClick={newGame}>
         New Game
       </button>
