@@ -23,6 +23,10 @@ function Board() {
   const [promoChoice, setPromoChoice] = useState("queen");
 
   const selectSquare = (e) => {
+    // can't select piece to move if game is over:
+    if (winner) {
+      return;
+    }
     const row = parseInt(e.target.dataset.row);
     const col = parseInt(e.target.dataset.col);
     // if no piece has been selected yet:
@@ -124,6 +128,14 @@ function Board() {
     setPromoChoice(choice);
   };
 
+  const newGame = () => {
+    setBoard(data.boardStart);
+    setTurn("white");
+    resetSelection();
+    setCheck(false);
+    setWinner(null);
+  };
+
   return (
     <div>
       <table>
@@ -146,11 +158,14 @@ function Board() {
           ))}
         </tbody>
       </table>
-      <p>Turn: {turn}</p>
-      <p>{check ? "Check!" : ""}</p>
-      <p>{winner ? `${turn} wins!` : ""}</p>
+      <p>{!winner ? `Turn: ${turn}` : ""}</p>
+      <p>{check && !winner ? "Check!" : ""}</p>
+      <p>{winner ? `${winner} wins!` : ""}</p>
       <p>Promo choice: {promoChoice}</p>
       <PromoChoice onChange={handlePromoPick} />
+      <button type="button" onClick={newGame}>
+        New Game
+      </button>
     </div>
   );
 }
