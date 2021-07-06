@@ -14,7 +14,7 @@ import {
 } from "./logic";
 
 function Board() {
-  const [board, setBoard] = useState(data.boardUtil);
+  const [board, setBoard] = useState(data.boardStart);
   const [targets, setTargets] = useState(data.targetsEmpty);
   const [selected, setSelected] = useState({ row: -1, col: -1 });
   const [turn, setTurn] = useState("white");

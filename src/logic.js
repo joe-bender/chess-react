@@ -53,6 +53,7 @@ function getCastlingTargets(piece, loc, board, targets) {
     !rook.hasMoved &&
     !board[row][5] &&
     !board[row][6] &&
+    !locIsThreatened(piece.color, { row, col: 4 }, board) &&
     !locIsThreatened(piece.color, { row, col: 5 }, board) &&
     !locIsThreatened(piece.color, { row, col: 6 }, board)
   ) {
@@ -67,8 +68,9 @@ function getCastlingTargets(piece, loc, board, targets) {
     !board[row][1] &&
     !board[row][2] &&
     !board[row][3] &&
-    !locIsThreatened(piece.color, { row, col: 2 }, board) &&
-    !locIsThreatened(piece.color, { row, col: 3 }, board)
+    !locIsThreatened(piece.color, { row, col: 4 }, board) &&
+    !locIsThreatened(piece.color, { row, col: 3 }, board) &&
+    !locIsThreatened(piece.color, { row, col: 2 }, board)
   ) {
     targets[row][2] = true;
   }
@@ -333,7 +335,11 @@ export function locIsThreatened(color, loc, board) {
 export function handleCastling(board, startLoc, endLoc) {
   let newBoard = deepCopy(board);
   let piece = newBoard[startLoc.row][startLoc.col];
-  if (piece.type === "king" && Math.abs(startLoc.col - endLoc.col) === 2) {
+  if (
+    piece.type === "king" &&
+    Math.abs(startLoc.col - endLoc.col) === 2 &&
+    !isInCheck(piece.color, newBoard)
+  ) {
     piece.hasMoved = true;
     if (endLoc.col === 6) {
       // mark right rook as moved:
