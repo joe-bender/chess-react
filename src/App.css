@@ -38,10 +38,10 @@ td.black {
   color: black;
 }
 
+td.check {
+  color: rgb(255, 38, 0);
+}
+
 td.selected {
   color: rgb(98, 252, 98);
-}
-td.check {
-  background-color: rgb(241, 243, 108);
-  color: rgb(255, 38, 0);
 }

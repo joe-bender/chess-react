@@ -73,7 +73,7 @@ function Chess() {
     if (pLoc) {
       setPromoLoc(pLoc);
       setChoosingPromo(true);
-      newBoard[pLoc.row][pLoc.col] = { code: "?" };
+      newBoard[pLoc.row][pLoc.col] = { color: turn, type: "promo" };
       setBoard(newBoard);
       resetSelection();
       return;

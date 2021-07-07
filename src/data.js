@@ -5,6 +5,7 @@ export const pieceCode = {
   bishop: "\u265D",
   knight: "\u265E",
   pawn: "\u265F",
+  promo: "?",
 };
 
 export const getPiece = (color, type) => {
