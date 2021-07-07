@@ -145,6 +145,7 @@ function Chess() {
       <Board
         board={board}
         check={check}
+        winner={winner}
         turn={turn}
         onClick={selectSquare}
         selected={selected}

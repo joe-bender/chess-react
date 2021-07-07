@@ -16,6 +16,7 @@ function Board(props) {
                 col={col}
                 piece={piece}
                 check={props.check}
+                winner={props.winner}
                 turn={props.turn}
                 selected={
                   row === props.selected.row && col === props.selected.col

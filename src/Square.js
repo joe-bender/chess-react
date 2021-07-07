@@ -12,8 +12,16 @@ function Square(props) {
   if (props.piece) {
     const piece = props.piece;
     classes.push(piece.color);
-    if (piece.type === "king" && piece.color === props.turn && props.check) {
-      classes.push("check");
+    if (piece.type === "king" && props.check) {
+      if (props.winner) {
+        if (piece.color !== props.turn) {
+          classes.push("check");
+        }
+      } else {
+        if (piece.color === props.turn) {
+          classes.push("check");
+        }
+      }
     }
   } else {
     classes.push("empty");
