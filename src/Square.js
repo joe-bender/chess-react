@@ -1,4 +1,3 @@
-import { classExpression } from "@babel/types";
 import * as data from "./data";
 
 function Square(props) {

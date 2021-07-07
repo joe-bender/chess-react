@@ -118,11 +118,11 @@ function Chess() {
   };
 
   // show the hovered piece's info:
-  const logPiece = (e) => {
-    // const row = parseInt(e.target.dataset.row);
-    // const col = parseInt(e.target.dataset.col);
-    // console.log(board[row][col]);
-  };
+  // const logPiece = (e) => {
+  //   const row = parseInt(e.target.dataset.row);
+  //   const col = parseInt(e.target.dataset.col);
+  //   console.log(board[row][col]);
+  // };
 
   const showTargets = (e) => {
     if (selected.row < 0 && selected.col < 0) {
